@@ -30,10 +30,10 @@ for lemma in lemmas:
     if 'о' in lemma and lemma.count('о')==2:
         lemmas_with_o_letter.append(lemma)
 # writing list in a text.txt file
-'''file = open('o_letters_list.txt','w')
+file = open('o_letters_list.txt','w')
 for item in lemmas_with_o_letter:
     file.write("%s\n" % item)
-file.close()'''
+file.close()
 
 # time to create a dictionary!
 dictionary = {}
@@ -45,6 +45,3 @@ dict_sort = sorted(dictionary.items(),key=lambda i: i[1], reverse = True)
 # writing dictionary in a json file
 with open('result.json', 'w') as file:
     json.dump(dict_sort, file, ensure_ascii=False)
-
-# еще раз почитай задание, что там делать и не забудь про json
-
