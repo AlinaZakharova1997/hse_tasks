@@ -1,0 +1,329 @@
+---
+title: "HW. Advanced tidyverse "
+output: html_document
+---
+
+
+
+## Corpus of bilingual children's speech 
+Data: https://www.kaggle.com/rtatman/corpus-of-bilingual-childrens-speech?select=guide_to_files.csv
+
+The Paradis corpus consists of naturalistic language samples from 25 children learning English as a second language (English language learners or learners of English as an additional language). Participants in this study were children from newcomer (immigrant and refugee) families to Canada. The children started to learn English as a second language (L2) after their first language (L1) had been established.
+
+Variables:
+
+  - age_of_arrival_to_Canada_months 
+  
+  - age_of_English_exposure_months(the age of onset of English acquisition) 
+  
+  - age_at_recording_months
+  
+  - months_of_english
+
+
+## Import required libraries
+```{r}
+library('tidyverse')
+
+```
+library('tidyverse')
+
+## 1. Data 
+
+### 1.1 Read guide_to_files.csv and create 'biling_speech_data' dataframe
+
+```{r}
+
+
+speech_data <- read.table(file = "speech_data.csv", header = TRUE, sep = ",")
+head(speech_data)
+
+```
+
+### 1.2 Use `'biling_speech_data'` dataframe and functions from tidyverse to answer the following questions:
+
+1. How many participants are mentioned in this dataframe?
+length(speech_data[, 'file_name']) #24
+
+2. How many of them are males and females?
+length(grep('F',speech_data[,'gender'],value = TRUE))# 8
+length(grep('M',speech_data[,'gender'],value = TRUE))# 16
+
+3. How many first languages are mentioned in the dataframe? # 9
+> speech_data %>%
++     distinct(`first_language`)
+  first_language
+1          Farsi
+2        Spanish
+3       Romanian
+4       Mandarin
+5      Cantonese
+6         Korean
+7      Ukrainian
+8         Arabic
+9       Japanese
+
+```{r}
+
+```
+
+## 2. Changing Data
+
+### 2.1 Choose all numeric columns from the dataframe using tidyselect. Check if there are NA in columns.  
+
+```
+nums <- dplyr::select_if(speech_data, is.numeric)
+> nums
+   age_of_arrival_to_Canada_months age_of_English_exposure_months
+1                               58                             63
+2                               53                             56
+3                               69                             69
+4                               73                             73
+5                                1                             48
+6                               53                             55
+7                               42                             47
+8                               67                             67
+9                               45                             58
+10                              48                             60
+11                              53                             53
+12                              66                             66
+13                               1                             47
+14                              56                             56
+15                              26                             42
+16                              88                             89
+17                               1                             40
+18                              45                             46
+19                              64                             66
+20                              60                             60
+21                              37                             39
+22                              68                             70
+23                               1                             42
+24                               1                             57
+   age_at_recording_months months_of_english
+1                       73                10
+2                       66                10
+3                       74                 5
+4                       81                 8
+5                       62                14
+6                       64                 9
+7                       54                 7
+8                       75                 8
+9                       68                10
+10                      62                 2
+11                      71                18
+12                      79                13
+13                      58                11
+14                      60                 4
+15                      51                 9
+16                      94                 5
+17                      56                16
+18                      61                15
+19                      78                12
+20                      66                 6
+21                      50                11
+22                      77                 7
+23                      50                 8
+24                      59                 9
+
+dplyr::select_if(nums, is.null)
+таблица данных с 0 колонок и 24 строками
+то есть нет таких
+
+```
+
+
+
+
+### 2.2 Convert all numerical data in the columns chosen before from months to years. Don't forget to save results in the dataframe! 
+
+```
+    
+new_data <- mutate(speech_data, age_of_arrival_to_Canada_years = age_of_arrival_to_Canada_months/12,age_of_English_exposure_years = age_of_English_exposure_months/12,age_at_recording_years = age_at_recording_months/12,years_of_english = months_of_english/12)
+
+```
+
+### 2.3 Rename changed columns for convenience
+
+```
+уже
+```
+
+## 3. Analysis of Data
+
+### 3.1 Answer the questions below using advanced functions of tidyverse
+
+1. What is the average age of child migration to Canada? 
+
+```mean(new_data[,'age_of_arrival_to_Canada_years'])
+[1] 3.736111
+```
+
+2. How many children whose first language is Spanish learnt English less than 10 month? How many of them are males and females?
+```
+> new_data %>%
++     filter(months_of_english < 10 & first_language == 'Spanish')
+    file_name first_language gender age_of_arrival_to_Canada_months age_of_English_exposure_months
+1 dvdc1.cha          Spanish      M                              67                             67
+2 rndl1.cha          Spanish      M                              88                             89
+3 smns1.cha          Spanish      M                              60                             60
+  age_at_recording_months months_of_english age_of_arrival_to_Canada_years age_of_English_exposure_years
+1                      75                 8                       5.583333                      5.583333
+2                      94                 5                       7.333333                      7.416667
+3                      66                 6                       5.000000                      5.000000
+  age_at_recording_years years_of_english
+1               6.250000        0.6666667
+2               7.833333        0.4166667
+3               5.500000        0.5000000
+
+Дальше я не смогла понять как сделать без ошибок, но ответ здесь 3 для M и 0 для F
+
+```
+
+3. What is the average age of children speaking the same first language at recording? What is the average migration age of children speaking the same first language?
+
+```
+age_at_recording_years
+```
+
+
+### 3.2 Find out mean, min and max age of onset of English acquisition for female and male participants with the help of advanced functions of tidyverse. Add information about their first language. 
+
+```{r}
+new_data %>%
+  filter(months_of_english < 10 & first_language == 'Spanish')%%
+  length(grep('M',new_data[,'gender'],value = TRUE))
+
+```
+
+### 3.3 Sort the data alphabetically by the column 'first_language'.
+
+```{r}
+   new_data %>%
+   select(1:10) %>%
+   arrange(first_language)
+
+``` 
+
+##When do children learn words?
+
+Data: https://www.kaggle.com/rtatman/when-do-children-learn-words?select=main_data.csv
+
+The main dataset includes information for 732 Norwegian words. A second table also includes measures of how frequently each word is used in Norwegian, both on the internet (as observed in the Norwegian Web as Corpus dataset) and when an adult is talking to a child.
+
+Main data necessary (!) variables:
+
+Translation: the English translation of the Norwegian word
+
+AoA: how old a child generally was when they learnt this word, in months
+
+VSoA: how many other words a child generally knows when they learn this word (rounded up to the nearest 10)
+
+Broad_lex: the broad part of speech of the word
+
+CDS_Freq: a measure of how commonly this word occurs when a Norwegian adult is talking to a Norwegian child
+
+Norwegian CDS Frequency necessary (!) variables:
+
+Translation: The English translation of the Norwegian word
+
+Freq_NoWaC: How often this word is used on the internet
+
+Freq_CDS: How often this word is used when talking to children (based on two Norwegian CHILDES corpora)
+
+NB! All the other columns should be deleted for your convenience. 
+
+NB!'Freq_CDS' and 'CDS_Freq' columns are the same. 
+
+## 4. Data 
+
+### 4.1 Read two tables 
+
+```{r}
+norwegia <- read.table(file = "Norwegia.csv", header = TRUE, sep = ",")
+main_data <- read.table(file = "main_data.csv", header = TRUE, sep = ",")
+file_names <- list.files(pattern = "Norwegia.csv", full.names = TRUE)
+library(data.table)
+df2 <- 
+  rbindlist(
+    lapply(file_names, fread)
+  )
+other_files <- list.files(pattern = "main_data.csv", full.names = TRUE)
+df3 <- 
+  rbindlist(
+    lapply(other_files, fread)
+  )
+```
+
+### 4.2 Leave only necessary columns
+
+```{r}
+#df2$Word_CDI <- NULL
+#df3$Translation <- NULL
+#df3$CDS_freq <- NULL
+#new_norwegia <- mutate(df2, Translate = Translation, FreqNoWaC = Freq_NoWaC, FreqCDS = Freq_CDS)
+#new_main <- mutate(df3, Translation = Translation, AoA = AoA, VSoA = VSoA, Broad_lex = Broad_lex)
+head(new_norwegia)
+
+```
+
+### 4.3  Join two tables and create a new dataframe 'norw_words'. NB! There shouldn't be duplicates in your new dataframe. 
+
+```{r}
+#norw_words <- merge(x = df2, y = df3, all.x = TRUE)
+norw_words$Word_CDI <- NULL
+norw_words$CDS_freq <- NULL
+head(norw_words)
+```
+
+### 4.4   Leave only 15 first rows
+ 
+```{r}
+norw_words %>% 
+  slice(1:15)
+
+
+```
+
+
+## 5. Experiments
+
+### 5.1  Create a tibble 'freq_statistics' using 3 columns: 'Translation', 'CDS_Freq', 'Freq_NoWaC'
+
+```{r}
+freq_statistics <- norw_words %>% select(Translation, CDS_Freq , Freq_NoWaC)
+```
+Change the format of the tibble using the function tidyr::pivot_longer() or tidyr::pivot_wider().
+
+```{r}
+
+```
+
+### 5.2  Get a string vector output with information about classes in the tibble. 
+
+```{r}
+
+```
+
+ Present the same information as a dataframe. 
+
+```{r}
+
+```
+
+### 5.3  Convert values from 'CDS_Freq' & 'Freq_NoWaC' to numeric ones. 
+
+```{r}
+
+```
+Get average values of all numeric classes in 'norw_words'.
+
+```{r}
+
+```
+
+### 5.4   Create a nested table (by 'Translation')
+ 
+```{r}
+
+```
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
